@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -47,7 +48,13 @@ namespace SimpleSlideShow.Bot.Services
                 Console.WriteLine($"ERROR: Error while processing message '{messageEventArgs.Message?.Text}'");
                 Console.WriteLine($"{ex.Message}\n{ex.StackTrace}");
             }
+        }
 
+        private void SaveCaption(string filename, string caption)
+        {
+           var picture = new FileInfo(filename);
+            string path = picture.FullName.Replace(picture.Extension, ".txt");
+            File.WriteAllText(path, caption, Encoding.Unicode);
         }
 
         internal void StopBot()
@@ -66,7 +73,8 @@ namespace SimpleSlideShow.Bot.Services
             var file = _botClient.GetFileAsync(photo.FileId).Result;
             if (file != null)
             {
-                DownloadFile(file, message.From);
+                var filename = DownloadFile(file, message.From);
+                SaveCaption(filename, message.Caption);
                 SendRandomThankYouMessage(message);
             }
         }
@@ -76,7 +84,7 @@ namespace SimpleSlideShow.Bot.Services
             _botClient.SendTextMessageAsync(message.Chat.Id, Messages.GetThankYou(message.From.LanguageCode));
         }
 
-        private void DownloadFile(Telegram.Bot.Types.File file, Telegram.Bot.Types.User from)
+        private string DownloadFile(Telegram.Bot.Types.File file, Telegram.Bot.Types.User from)
         {
             var username = GetUsername(from); ;
 
@@ -88,6 +96,7 @@ namespace SimpleSlideShow.Bot.Services
                 var fileStream = _botClient.DownloadFileAsync(originalPath, outputFile, new System.Threading.CancellationToken());
                 Task.WaitAll(fileStream);
             }
+            return pathToFile;
         }
 
         private string BuildPathToFile(string username, string originalPath)
