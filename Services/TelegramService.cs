@@ -14,12 +14,14 @@ namespace SimpleSlideShow.Bot.Services
     {
         private readonly TelegramBotClient _botClient;
         private readonly string _saveToPath;
+        private bool _enabled = false;
 
-        public TelegramService(string apiToken, string saveToPath)
+        public TelegramService(string apiToken, string saveToPath, bool startEnabled)
         {
             _botClient = new TelegramBotClient(apiToken);
             _botClient.OnMessage += BotOnMessageReceived;
             _saveToPath = saveToPath;
+            _enabled = startEnabled;
         }
 
         private void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
@@ -29,6 +31,16 @@ namespace SimpleSlideShow.Bot.Services
                 var message = messageEventArgs.Message;
                 if (message != null)
                 {
+                    if (IsEnableCommand(message)) {
+                        _enabled = true;
+                        _botClient.SendTextMessageAsync(message.Chat.Id, Messages.GetEnabledConfirmationMessage(message.From.LanguageCode));
+                        return;
+                    }
+                    if (!IsEnabled()) 
+                    {
+                        _botClient.SendTextMessageAsync(message.Chat.Id, Messages.GetNotYetStartedMessage(message.From.LanguageCode));
+                        return;
+                    }
                     if (IsStartCommand(message))
                     {
                         _botClient.SendTextMessageAsync(message.Chat.Id, Messages.GetWelcomeMessage(message.From.LanguageCode));
@@ -48,6 +60,16 @@ namespace SimpleSlideShow.Bot.Services
                 Console.WriteLine($"ERROR: Error while processing message '{messageEventArgs.Message?.Text}'");
                 Console.WriteLine($"{ex.Message}\n{ex.StackTrace}");
             }
+        }
+
+        private bool IsEnableCommand(Telegram.Bot.Types.Message message)
+        {
+            return "/full-speed-ahead".Equals(message.Text, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private bool IsEnabled()
+        {
+            return _enabled;
         }
 
         private void SaveCaption(string filename, string caption)

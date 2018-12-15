@@ -35,6 +35,24 @@ namespace SimpleSlideShow.Bot
             }
         };
 
+        internal static string GetEnabledConfirmationMessage(string language)
+        {
+            if (ENABLED_CONFIRMATION_MESSAGES.ContainsKey(language))
+            {
+                return ENABLED_CONFIRMATION_MESSAGES[language];
+            }
+            return ENABLED_CONFIRMATION_MESSAGES["en"];
+        }
+
+        internal static string GetNotYetStartedMessage(string language)
+        {
+            if (NOT_YET_STARTED_MESSAGES.ContainsKey(language))
+            {
+                return NOT_YET_STARTED_MESSAGES[language];
+            }
+            return NOT_YET_STARTED_MESSAGES["en"];
+        }
+
         private static Dictionary<string, string> WELCOME_MESSAGES = new Dictionary<string, string> 
         {
             {
@@ -57,6 +75,18 @@ Dann knips mal drauf los! 😃👍"
         {
             {"en", "No magic or special knowledge required. Just take a picture 📷 with your phone and send it to me. I'll put it on the picture wall. 😃👍"},
             {"de", "Da gibt es nichts zu können. Schick mir einfach deine Fotos 📷 und ich packe sie auf die digitale Fotowand! 😃👍"}
+        };
+
+        private static Dictionary<string, string> NOT_YET_STARTED_MESSAGES = new Dictionary<string, string> 
+        {
+            {"en", "\"Patience you must have, my young padawan.\"\n -Yoda"},
+            {"de", "\"Geduld du haben must, junger Padawan.\"\n -Yoda"}
+        };
+
+        private static Dictionary<string, string> ENABLED_CONFIRMATION_MESSAGES = new Dictionary<string, string> 
+        {
+            {"en", "Aye, aye, captian!"},
+            {"de", "Aye, aye, Käpt'n!"}
         };
 
         public static string GetWelcomeMessage(string language)

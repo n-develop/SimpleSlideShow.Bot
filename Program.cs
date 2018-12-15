@@ -17,7 +17,8 @@ namespace SimpleSlideShow.Bot
 
             var token = configuration["api-token"];
             var saveImagesTo = configuration["saveImagesTo"];
-            var telegram = new TelegramService(token, saveImagesTo);
+            var startEnabled = "true".Equals(configuration["startEnabled"], StringComparison.InvariantCultureIgnoreCase);
+            var telegram = new TelegramService(token, saveImagesTo, startEnabled);
 
             Console.WriteLine($"Start listening...");
             telegram.StartBot();
