@@ -112,12 +112,13 @@ namespace SimpleSlideShow.Bot.Services
 
             var originalPath = file.FilePath;
             string pathToFile = BuildPathToFile(username, originalPath);
-            using (var outputFile = File.Create(pathToFile))
+            using (var outputFile = File.Create(pathToFile + ".cpy"))
             {
                 Console.WriteLine($"Writing {pathToFile}...");
                 var fileStream = _botClient.DownloadFileAsync(originalPath, outputFile, new System.Threading.CancellationToken());
                 Task.WaitAll(fileStream);
             }
+            File.Move(pathToFile + ".cpy", pathToFile);
             return pathToFile;
         }
 
